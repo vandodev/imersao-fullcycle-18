@@ -1,29 +1,42 @@
 GET http://localhost:3000/events
 
 ###
+# @name createEvent
 POST http://localhost:3000/events
 Content-Type: application/json
 
 {
-  "name": "event xdrt",
-  "description": "xdrt",
+  "name": "event name",
+  "description": "event description",
   "date": "2020-01-01T13:00:00",
-  "price": 5689
+  "price": 100
 }
 
 ###
-GET http://localhost:3000/events/ccb6a404-b525-4495-a478-c2c36819e774
+
+@eventId = {{ createEvent.response.body.id }}
 
 ###
-PATCH   http://localhost:3000/events/ccb6a404-b525-4495-a478-c2c36819e774
+GET http://localhost:3000/events/{{eventId}}
 Content-Type: application/json
 
 {
-  "name": "event qwer",
-  "description": "qwer",
+  "name": "event name",
+  "description": "event description",
   "date": "2020-01-01T13:00:00",
-  "price": 5689
+  "price": 100
 }
 
 ###
-DELETE http://localhost:3000/events/ccb6a404-b525-4495-a478-c2c36819e774
+PATCH http://localhost:3000/events/{{eventId}}
+Content-Type: application/json
+
+{
+  "name": "event name edited",
+  "description": "event description edited",
+  "date": "2022-01-01T13:00:00",
+  "price": 1000
+}
+
+###
+DELETE http://localhost:3000/events/{{eventId}}

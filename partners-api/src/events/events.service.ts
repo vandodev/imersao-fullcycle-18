@@ -3,6 +3,7 @@ import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ReserveSpotDto } from './dto/reserve-spot.dto';
+import { TicketStatus } from '@prisma/client';
 
 @Injectable()
 export class EventsService {
@@ -61,6 +62,15 @@ export class EventsService {
 
       throw new Error(`Spots ${notFoundSpotsName.join(', ')} not found`);
     }
-  }
-  
+
+  //Criando reserva
+   await this.prismaService.reservationHistory.createMany({
+      data: spots.map((spot) => ({
+        spotId: spot.id,
+        email: dto.email,
+        ticketKind: dto.ticket_kind,
+        status: TicketStatus.RESERVED,
+      })),
+    })
+  }  
 }

@@ -83,5 +83,18 @@ export class EventsService {
         status: SpotStatus.RESERVED,
       },
     });
+
+    const tickets = await Promise.all(
+      spots.map((spot) =>
+        this.prismaService.ticket.create({
+          data: {
+            spotId: spot.id,
+            ticketKind: dto.ticket_kind,
+            email: dto.email,
+          },
+        })
+      )
+    )
+    return tickets;
   }  
 }

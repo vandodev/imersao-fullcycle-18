@@ -3,7 +3,7 @@ import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ReserveSpotDto } from './dto/reserve-spot.dto';
-import { TicketStatus, SpotStatus } from '@prisma/client';
+import { TicketStatus, SpotStatus, Prisma} from '@prisma/client';
 
 @Injectable()
 export class EventsService {
@@ -63,38 +63,50 @@ export class EventsService {
       throw new Error(`Spots ${notFoundSpotsName.join(', ')} not found`);
     }
 
-  //Criando reserva
-   await this.prismaService.reservationHistory.createMany({
-      data: spots.map((spot) => ({
-        spotId: spot.id,
-        email: dto.email,
-        ticketKind: dto.ticket_kind,
-        status: TicketStatus.RESERVED,
-      })),
-    })
-
-    await this.prismaService.spot.updateMany({
-      where: {
-        id: {
-          in: spots.map((spot) => spot.id),
-        },
-      },
-      data: {
-        status: SpotStatus.RESERVED,
-      },
-    });
-
-    const tickets = await Promise.all(
-      spots.map((spot) =>
-        this.prismaService.ticket.create({
-          data: {
-            spotId: spot.id,
-            ticketKind: dto.ticket_kind,
-            email: dto.email,
-          },
-        })
-      )
-    )
-    return tickets;
+    try {
+      const tickets = this.prismaService.$transaction(async (prisma) => {
+        //Criando reserva
+         await prisma.reservationHistory.createMany({
+            data: spots.map((spot) => ({
+              spotId: spot.id,
+              email: dto.email,
+              ticketKind: dto.ticket_kind,
+              status: TicketStatus.RESERVED,
+            })),
+          })
+      
+          await prisma.spot.updateMany({
+            where: {
+              id: {
+                in: spots.map((spot) => spot.id),
+              },
+            },
+            data: {
+              status: SpotStatus.RESERVED,
+            },
+          });
+      
+          const tickets = await Promise.all(
+            spots.map((spot) =>
+              this.prismaService.ticket.create({
+                data: {
+                  spotId: spot.id,
+                  ticketKind: dto.ticket_kind,
+                  email: dto.email,
+                },
+              })
+            )
+          )
+      })      
+      return tickets;      
+    } catch (e) {
+      if (e instanceof Prisma.PrismaClientKnownRequestError) {
+        switch (e.code) {
+          case 'P2002':
+            case 'P2034':
+              throw new Error('Some of the spots are already reserved');
+        }
+      }
+    }
   }  
 }

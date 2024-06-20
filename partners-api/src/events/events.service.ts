@@ -3,7 +3,7 @@ import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ReserveSpotDto } from './dto/reserve-spot.dto';
-import { TicketStatus } from '@prisma/client';
+import { TicketStatus, SpotStatus } from '@prisma/client';
 
 @Injectable()
 export class EventsService {
@@ -72,5 +72,16 @@ export class EventsService {
         status: TicketStatus.RESERVED,
       })),
     })
+
+    await this.prismaService.spot.updateMany({
+      where: {
+        id: {
+          in: spots.map((spot) => spot.id),
+        },
+      },
+      data: {
+        status: SpotStatus.RESERVED,
+      },
+    });
   }  
 }

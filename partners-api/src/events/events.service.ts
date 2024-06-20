@@ -64,17 +64,17 @@ export class EventsService {
     }
 
     try {
-      const tickets = this.prismaService.$transaction(async (prisma) => {
-        //Criando reserva
-         await prisma.reservationHistory.createMany({
+      const tickets = await this.prismaService.$transaction(
+        async (prisma) => {
+          await prisma.reservationHistory.createMany({
             data: spots.map((spot) => ({
               spotId: spot.id,
               email: dto.email,
               ticketKind: dto.ticket_kind,
               status: TicketStatus.RESERVED,
             })),
-          })
-      
+          });
+
           await prisma.spot.updateMany({
             where: {
               id: {
@@ -85,28 +85,33 @@ export class EventsService {
               status: SpotStatus.RESERVED,
             },
           });
-      
+
           const tickets = await Promise.all(
             spots.map((spot) =>
-              this.prismaService.ticket.create({
+              prisma.ticket.create({
                 data: {
                   spotId: spot.id,
                   ticketKind: dto.ticket_kind,
                   email: dto.email,
                 },
-              })
-            )
-          )
-      })      
-      return tickets;      
+              }),
+            ),
+          );
+
+          return tickets;
+        },
+        { isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted },
+      );
+      return tickets;
     } catch (e) {
       if (e instanceof Prisma.PrismaClientKnownRequestError) {
         switch (e.code) {
           case 'P2002':
-            case 'P2034':
-              throw new Error('Some of the spots are already reserved');
+          case 'P2034':
+            throw new Error('Some of the spots are already reserved');
         }
       }
+      throw e;
     }
-  }  
+  }
 }

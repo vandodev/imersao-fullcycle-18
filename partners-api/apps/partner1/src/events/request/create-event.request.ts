@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-export class CreateEventDto {
+export class CreateEventRequest {
   name: string;
   description: string;
   date: string;

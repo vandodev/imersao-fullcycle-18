@@ -17,15 +17,6 @@
         "tsConfigPath": "libs/core/tsconfig.lib.json"
       }
     },
-    "partners-api": {
-      "type": "application",
-      "root": "apps/partners-api",
-      "entryFile": "main",
-      "sourceRoot": "apps/partners-api/src",
-      "compilerOptions": {
-        "tsConfigPath": "apps/partners-api/tsconfig.app.json"
-      }
-    },
     "partner1": {
       "type": "application",
       "root": "apps/partner1",
@@ -46,5 +37,5 @@
     }
   },
   "monorepo": true,
-  "root": "apps/partners-api"
+  "root": "apps/partner1"
 }

@@ -4,10 +4,13 @@ import { PrismaModule } from '@app/core/prisma/prisma.module';
 import { LugaresModule } from './lugares/lugares.module';
 import { ConfigModule } from '@nestjs/config';
 
+import { AuthModule } from '@app/core/auth/auth.module';
+
 @Module({
   imports: [
-    ConfigModule.forRoot({ envFilePath: '.env.partner1'}),   
-    PrismaModule,
+    ConfigModule.forRoot({ envFilePath: '.env.partner1',isGlobal: true}),   
+    PrismaModule,    
+    AuthModule,
     EventosModule,
     LugaresModule,
   ],

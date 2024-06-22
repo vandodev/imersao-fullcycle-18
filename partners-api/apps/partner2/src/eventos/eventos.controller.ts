@@ -6,12 +6,14 @@ import {
     Patch,
     Param,
     Delete,
-    HttpCode,    
+    HttpCode,  
+    UseGuards,  
   } from '@nestjs/common';
   import { EventsService } from '@app/core/events/events.service';
   import { CriarEventoRequest } from './request/criar-evento.request';
   import { AtualizarEventoRequest } from './request/atualizar-evento.request';
   import { ReservarLugarRequest } from '../lugares/request/reservar-lugar.request';
+  import { AuthGuard } from '@app/core/auth/auth.guard';
  
   
   @Controller('eventos')
@@ -57,6 +59,7 @@ import {
       return this.eventsService.remove(id);
     }
   
+    @UseGuards(AuthGuard)
     @Post(':id/reservar')
     reserveSpots(
       @Body() reservarLugarRequest: ReservarLugarRequest,

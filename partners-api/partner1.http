@@ -4,7 +4,6 @@ GET http://localhost:3000/events
 # @name createEvent
 POST http://localhost:3000/events
 Content-Type: application/json
-
 {
   "name": "event name",
   "description": "event description",
@@ -60,7 +59,7 @@ Content-Type: application/json
 ###
 POST http://localhost:3000/events/{{eventId}}/reserve
 Content-Type: application/json
-
+X-Api-Token: 1234
 {
   "spots": ["{{ spotName }}"],
   "ticket_kind": "FULL",

@@ -50,7 +50,7 @@ POST http://localhost:3000/events/{{eventId}}/spots
 Content-Type: application/json
 
 {
-  "name": "A5"
+  "name": "A1"
 }
 
 ###
